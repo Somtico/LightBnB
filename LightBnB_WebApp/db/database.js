@@ -18,8 +18,8 @@ const users = require("./json/users.json");
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithEmail = function (email) {
-  const queryString = `SELECT *
-    FROM users
+  const queryString = `
+    SELECT * FROM users
     WHERE email = $1;
   `;
 
@@ -33,7 +33,7 @@ const getUserWithEmail = function (email) {
       }
     })
     .catch((err) => {
-      console.log('Query error:', err.message);
+      console.log('getUserWithEmail query error:', err.message);
       throw err;
     });
 };
@@ -44,8 +44,8 @@ const getUserWithEmail = function (email) {
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithId = function (id) {
-  const queryString = `SELECT *
-    FROM users
+  const queryString = `
+    SELECT * FROM users
     WHERE id = $1;
   `;
 
@@ -59,7 +59,7 @@ const getUserWithId = function (id) {
       }
     })
     .catch((err) => {
-      console.log('Query error:', err.message);
+      console.log('getUserWithId query error:', err.message);
       throw err;
     });
 };
@@ -70,7 +70,8 @@ const getUserWithId = function (id) {
  * @return {Promise<{}>} A promise to the user.
  */
 const addUser = function (user) {
-  const queryString = `INSERT INTO users(name, email, password)
+  const queryString = `
+    INSERT INTO users(name, email, password)
     VALUES ($1, $2, $3)
     RETURNING *;
   `;
@@ -81,7 +82,7 @@ const addUser = function (user) {
       return result.rows[0];
     })
     .catch((err) => {
-      console.log('Query error:', err.message);
+      console.log('addUser query error:', err.message);
       throw err;
     });
 };
@@ -94,7 +95,22 @@ const addUser = function (user) {
  * @return {Promise<[{}]>} A promise to the reservations.
  */
 const getAllReservations = function (guest_id, limit = 10) {
-  return getAllProperties(null, 2);
+  const queryString = `
+    SELECT * FROM properties
+    JOIN reservations ON properties.id = property_id
+    JOIN property_reviews ON properties.id = property_reviews.property_id
+    WHERE reservations.guest_id = $1
+    LIMIT $2;
+    `;
+
+  return pool
+    .query(queryString, [guest_id, limit])
+    .then((result) => {
+      return result.rows;
+    })
+    .catch((err) => {
+      console.log('getAllReservations query error:', err.message);
+    });
 };
 
 /// Properties
@@ -117,7 +133,7 @@ const getAllProperties = (options, limit = 10) => {
       return result.rows;
     })
     .catch((err) => {
-      console.log(err.message);
+      console.log('getAllProperties query error:', err.message);
     });
 };
 
