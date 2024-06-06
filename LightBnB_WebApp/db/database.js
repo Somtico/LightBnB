@@ -146,27 +146,27 @@ const getAllProperties = (options, limit = 10) => {
     whereClause.push(`owner_id = $${queryParams.length}`);
   }
 
-  if(options.minimum_price_per_night) {
+  if (options.minimum_price_per_night) {
     queryParams.push(options.minimum_price_per_night * 100);
-    whereClause.push(`cost_per_night >= $${queryParams.length}`)
+    whereClause.push(`cost_per_night >= $${queryParams.length}`);
   }
 
-  if(options.maximum_price_per_night) {
+  if (options.maximum_price_per_night) {
     queryParams.push(options.maximum_price_per_night * 100);
-    whereClause.push(`cost_per_night <= $${queryParams.length}`)
+    whereClause.push(`cost_per_night <= $${queryParams.length}`);
   }
 
-  if(whereClause.length > 0) {
-    queryString += `  WHERE ${whereClause.join(' AND ')}`;
+  if (whereClause.length > 0) {
+    queryString += `  WHERE ${whereClause.join(" AND ")}`;
   }
 
   queryString += `
   GROUP BY properties.id
   `;
 
-  if(options.minimum_rating) {
+  if (options.minimum_rating) {
     queryParams.push(options.minimum_rating);
-    queryString += `HAVING AVG(property_reviews.rating) >= $${queryParams.length}`
+    queryString += `HAVING AVG(property_reviews.rating) >= $${queryParams.length}`;
   }
 
   queryParams.push(limit);
@@ -229,7 +229,7 @@ const addProperty = function (property) {
     property.country,
     property.parking_spaces,
     property.number_of_bathrooms,
-    property.number_of_bedrooms
+    property.number_of_bedrooms,
   ];
 
   return pool
@@ -238,7 +238,7 @@ const addProperty = function (property) {
       return result.rows[0];
     })
     .catch((err) => {
-      console.log('addProperty query error:', err);
+      console.log("addProperty query error:", err);
       throw err;
     });
 };
