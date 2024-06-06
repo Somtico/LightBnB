@@ -110,6 +110,7 @@ const getAllReservations = function (guest_id, limit = 10) {
     })
     .catch((err) => {
       console.log('getAllReservations query error:', err.message);
+      throw err;
     });
 };
 
@@ -134,6 +135,7 @@ const getAllProperties = (options, limit = 10) => {
     })
     .catch((err) => {
       console.log('getAllProperties query error:', err.message);
+      throw err;
     });
 };
 
