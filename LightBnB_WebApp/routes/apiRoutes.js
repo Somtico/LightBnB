@@ -1,11 +1,12 @@
-const express = require("express");
-const database = require("../db/database");
+const express = require('express');
+const { getAllProperties, addProperty } = require('../db/queries/properties');
+const { getAllReservations } = require('../db/queries/reservations');
 
 const router = express.Router();
 
-router.get("/properties", (req, res) => {
-  database
-    .getAllProperties(req.query, 20)
+router.get('/properties', (req, res) => {
+  const limit = parseInt(req.query.limit, 10) || 10;  // Default to 10 if not specified
+  getAllProperties(req.query, limit)
     .then((properties) => res.send({ properties }))
     .catch((e) => {
       console.error(e);
@@ -13,14 +14,13 @@ router.get("/properties", (req, res) => {
     });
 });
 
-router.get("/reservations", (req, res) => {
+router.get('/reservations', (req, res) => {
   const userId = req.session.userId;
   if (!userId) {
-    return res.send({ error: "error" });
+    return res.send({ error: 'error' });
   }
 
-  database
-    .getAllReservations(userId)
+  getAllReservations(userId)
     .then((reservations) => res.send({ reservations }))
     .catch((e) => {
       console.error(e);
@@ -28,16 +28,15 @@ router.get("/reservations", (req, res) => {
     });
 });
 
-router.post("/properties", (req, res) => {
+router.post('/properties', (req, res) => {
   const userId = req.session.userId;
   if (!userId) {
-    return res.send({ error: "error" });
+    return res.send({ error: 'error' });
   }
 
   const newProperty = req.body;
   newProperty.owner_id = userId;
-  database
-    .addProperty(newProperty)
+  addProperty(newProperty)
     .then((property) => {
       res.send(property);
     })
